@@ -8,7 +8,7 @@ const io = socket(
   httpServer,
   {
     cors: {
-      origin: 'https://g3-delivery.vercel.app/',
+      origin: 'https://g3-delivery.vercel.app',
       methods: ['GET', 'POST'],
     },
   },
