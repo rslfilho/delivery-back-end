@@ -11,7 +11,7 @@
   "scripts": {
     "db:reset": "npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all",
     "start": "node .",
-    "build": "npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all",
+    "build": "npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all",
     "dev": "nodemon .",
     "test": "NODE_ENV=test npm run db:reset && NODE_ENV=test mocha src/tests/**/*$NAME*.test.js --exit",
     "test:coverage": "nyc --all npm run test",
