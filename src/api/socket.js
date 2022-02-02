@@ -8,7 +8,7 @@ const io = socket(
   httpServer,
   {
     cors: {
-      origin: 'http://localhost:3000',
+      origin: 'https://g3-deliveryapp.herokuapp.com/',
       methods: ['GET', 'POST'],
     },
   },
