@@ -1,0 +1,610 @@
+---
+swagger: '2.0'
+info:
+  title: Delivery App API
+  version: 0.0.1
+  description: |
+    Documentação para a aplicação banckend para o projeto Delivery App
+
+    Existem 03 níveis de autorização nessa API: Administrador, Vendedor e Consumidor. Os níveis de acesso são acumulativos e crescentes, um vendedor tem acesso a tudo que o consumidor tem e mais um pouco, assim como um admin tem acesso a todas as rotas.
+
+    Existem 03 usuários cadastrados inicialmente no banco de dados após a Migration, um admin, um vendedor e um consumidor:
+
+    Admin:
+      - email: adm@deliveryapp.com
+      - senha: --adm2@21!!--
+    
+    Vendedor:
+      - email: fulana@deliveryapp.com
+      - senha: fulana@123
+    
+    Consumidor:
+      - email: zebirita@email.com
+      - senha: $#zebirita#$
+
+    Os tokens a seguir estão válidos até o dia 10/02/2022
+
+    Admin: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJuYW1lIjoiRGVsaXZlcnkgQXBwIEFkbWluIiwiZW1haWwiOiJhZG1AZGVsaXZlcnlhcHAuY29tIiwicm9sZSI6ImFkbWluaXN0cmF0b3IifSwiaWF0IjoxNjQzMzE4NzkxLCJleHAiOjE2NDQ1MjgzOTF9.iqPNPL8-DjNRWigYaq3NC9wgbhxnEIe5rgkE9V-QXjY
+
+    Vendedor: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoyLCJuYW1lIjoiRnVsYW5hIFBlcmVpcmEiLCJlbWFpbCI6ImZ1bGFuYUBkZWxpdmVyeWFwcC5jb20iLCJyb2xlIjoic2VsbGVyIn0sImlhdCI6MTY0MzMxODg2NywiZXhwIjoxNjQ0NTI4NDY3fQ.4tzsIOhAtd_3232rZ7q5J5Yh9Ow3LxOpCy1odD7QVq0
+
+    Consumidor: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjozLCJuYW1lIjoiQ2xpZW50ZSBaw6kgQmlyaXRhIiwiZW1haWwiOiJ6ZWJpcml0YUBlbWFpbC5jb20iLCJyb2xlIjoiY3VzdG9tZXIifSwiaWF0IjoxNjQzMzE4OTA0LCJleHAiOjE2NDQ1Mjg1MDR9.KaTAoFg_SJU6uN4peQomqFr5JqurVpmAqS-aEbP2AjY
+securityDefinitions:
+  adminAuth:
+    type: apiKey
+    in: header
+    name: Authorization
+  vendedorAuth:
+    type: apiKey
+    in: header
+    name: Authorization
+  consumidorAuth:
+    type: apiKey
+    in: header
+    name: Authorization
+basePath: /
+paths:
+  /login:
+    post:
+      tags:
+        - Login
+      summary: "Faz o login de um usuário (auth: none)"
+      description: Recebe as informações do usuário, confere com as do banco de dados e em caso de informações válidas retorna informações do usuário e um token de autenticação.
+      parameters:
+        - in: body
+          name: body
+          type: object
+          required: true
+          schema:
+            type: object
+            properties:
+              email: 
+                type: string
+              password:
+                type: string
+      responses:
+        200:
+          description: Retorna as informações do usuário com um token de autenticação
+        400:
+          description: Informações enviadas mal formatadas, algum campo inválido
+        404:
+          description: Usuário não encontrado, email enviado não existe no banco de dados
+        500:
+          description: Erro interno de servidor
+  /products:
+    get:
+      security:
+        - consumidorAuth: []
+          vendedorAuth: []
+          adminAuth: []
+      tags:
+        - Products
+      summary: "Lista todos os produtos cadastrados (auth: consumidor)"
+      description: Verifica se o usuário está autenticado e lista todos os produtos cadastrados no banco de dados.
+      responses:
+        200:
+          description: Retorna todos os produtos cadastrados no banco de dados
+        401:
+          description: Token de autenticação ausente ou incorreto
+        500:
+          description: Erro interno de servidor
+    post:
+      security:
+        - vendedorAuth: []
+          adminAuth: []
+      tags:
+        - Products
+      summary: "Adiciona um novo produto (auth: vendedor)"
+      description: Verifica se o usuário está autenticado, tem nível de autenticação mínimo de vendedor e, recebendo os dados corretos, adiciona um novo produto ao banco de dados
+      parameters:
+        - in: body
+          name: body
+          type: object
+          required: true
+          schema:
+            type: object
+            properties:
+              name: 
+                type: string
+              price:
+                type: number
+              urlImage:
+                type: string
+      responses:
+        201:
+          description: Retorna o produto criado
+        400:
+          description: Dados para cadastro incorretos (faltando ou erro de formatação)
+        401:
+          description: Token de autenticação ausente, incorreto ou de um usuário sem nível de acesso apropriado
+        409:
+          description: Produto com o mesmo nome já cadastrado no banco de dados
+        500:
+          description: Erro interno de servidor
+  /products/{id}:
+    get:
+      security:
+        - consumidorAuth: []
+          vendedorAuth: []
+          adminAuth: []
+      tags:
+        - Products
+      summary: "Retorna um produto cadastrado a partir do ID (auth: consumidor)"
+      description: Verifica se o usuário está autenticado, recebe o ID pelos parâmetros da rota, busca no banco o produto referente a esse ID e retorna as informações deste produto.
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: Id do produto
+      responses:
+        200:
+          description: Retorna as informações do produto a partir do ID
+        401:
+          description: Token de autenticação ausente ou incorreto
+        404:
+          description: Produto com o ID passado não encontrado no banco de dados
+        500:
+          description: Erro interno de servidor
+    delete:
+      security:
+        - vendedorAuth: []
+          adminAuth: []
+      tags:
+        - Products
+      summary: "Deleta um produto cadastrado a partir do ID (auth: vendedor)"
+      description: Verifica se o usuário está autenticado e tem nível de autenticação mínimo de vendedor, recebe o ID pelos parâmetros da rota, busca no banco o produto referente a esse ID e deleta as informações deste produto.
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: Id do produto
+      responses:
+        200:
+          description: Retorna uma mensagem de sucesso e o ID do produto deletado
+        401:
+          description: Token de autenticação ausente, incorreto ou de um usuário sem nível de acesso apropriado
+        404:
+          description: Produto com o ID passado não encontrado no banco de dados
+        500:
+          description: Erro interno de servidor
+    put:
+      security:
+        - vendedorAuth: []
+          adminAuth: []
+      tags:
+        - Products
+      summary: "Atualiza um produto cadastrado a partir do ID (auth: vendedor)"
+      description: Verifica se o usuário está autenticado e tem nível de autenticação mínimo de vendedor, recebe o ID pelos parâmetros da rota, busca no banco o produto referente a esse ID e atualiza as informações deste produto.
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: Id do produto
+        - in: body
+          name: body
+          type: object
+          required: true
+          schema:
+            type: object
+            properties:
+              name: 
+                type: string
+              price:
+                type: number
+              urlImage:
+                type: string
+      responses:
+        200:
+          description: Retorna uma mensagem de sucesso e o ID do produto atualizado
+        401:
+          description: Token de autenticação ausente, incorreto ou de um usuário sem nível de acesso apropriado
+        400:
+          description: Dados incorretos (faltando ou erro de formatação)
+        404:
+          description: Produto com o ID passado não encontrado no banco de dados
+        500:
+          description: Erro interno de servidor
+  /users:
+    post:
+      security:
+        - adminAuth: []
+      tags:
+        - Users
+      summary: "Adiciona um novo usuário (auth: admin)"
+      description: Verifica se o usuário está autenticado, tem nível de autenticação mínimo de admin e, recebendo os dados corretos, adiciona um novo usuário ao banco de dados
+      parameters:
+        - in: body
+          name: body
+          type: object
+          required: true
+          description: A chave "role" no body pode ser ignorada, valor padrão "customer".
+          schema:
+            type: object
+            properties:
+              name: 
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+              role:
+                type: string
+      responses:
+        201:
+          description: Retorna o usuário criado
+        400:
+          description: Dados para cadastro incorretos (faltando ou erro de formatação)
+        401:
+          description: Token de autenticação ausente, incorreto ou de um usuário sem nível de acesso apropriado
+        409:
+          description: Usuário com o mesmo nome ou email já cadastrado no banco de dados
+        500:
+          description: Erro interno de servidor
+    get:
+      security:
+        - vendedorAuth: []
+          adminAuth: []
+      tags:
+        - Users
+      summary: "Lista todos os usuários cadastrados (auth: vendedor)"
+      description: Verifica se o usuário está autenticado, tem nível de autenticação mínimo de vendedor e lista todos os usuários cadastrados no banco de dados
+      responses:
+        200:
+          description: Retorna todos os usuários cadastrados no banco de dados
+        401:
+          description: Token de autenticação ausente, incorreto ou de um usuário sem nível de acesso apropriado
+        500:
+          description: Erro interno de servidor
+  /users/register:
+    post:
+      tags:
+        - Users
+      summary: "Adiciona um novo usuário"
+      description: Verifica se o usuário está autenticado e, recebendo os dados corretos, adiciona um novo usuário ao banco de dados
+      parameters:
+        - in: body
+          name: body
+          type: object
+          required: true
+          schema:
+            type: object
+            properties:
+              name: 
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+      responses:
+        201:
+          description: Retorna o usuário criado
+        400:
+          description: Dados para cadastro incorretos (faltando ou erro de formatação)
+        409:
+          description: Usuário com o mesmo nome ou email já cadastrado no banco de dados
+        500:
+          description: Erro interno de servidor
+  /users/{id}:
+    get:
+      security:
+        - consumidorAuth: []
+          vendedorAuth: []
+          adminAuth: []
+      tags:
+        - Users
+      summary: "Retorna um usuário cadastrado a partir do ID (auth: consumidor)"
+      description: Verifica se o usuário está autenticado, recebe o ID pelos parâmetros da rota (se for um consumidor verifica se tem o mesmo ID que está buscando), busca no banco o usuário referente a esse ID e retorna as informações deste usuário.
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: Id do usuário
+      responses:
+        200:
+          description: Retorna as informações do usuário a partir do ID
+        401:
+          description: Token de autenticação ausente ou incorreto
+        404:
+          description: Usuário com o ID passado não encontrado no banco de dados
+        500:
+          description: Erro interno de servidor
+    delete:
+      security:
+        - adminAuth: []
+      tags:
+        - Users
+      summary: "Deleta um usuário cadastrado a partir do ID (auth: vendedor)"
+      description: Verifica se o usuário está autenticado e tem nível de autenticação mínimo de admin, recebe o ID pelos parâmetros da rota, busca no banco o usuário referente a esse ID e deleta as informações deste usuário.
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: Id do usuário
+      responses:
+        200:
+          description: Retorna uma mensagem de sucesso e o ID do usuário deletado
+        401:
+          description: Token de autenticação ausente, incorreto ou de um usuário sem nível de acesso apropriado
+        404:
+          description: Usuário com o ID passado não encontrado no banco de dados
+        500:
+          description: Erro interno de servidor
+    put:
+      security:
+        - adminAuth: []
+      tags:
+        - Users
+      summary: "Atualiza um usuário cadastrado a partir do ID (auth: admin)"
+      description: Verifica se o usuário está autenticado e tem nível de autenticação mínimo de admin, recebe o ID pelos parâmetros da rota, busca no banco o usuário referente a esse ID e atualiza as informações deste usuário.
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: Id do usuário
+        - in: body
+          name: body
+          type: object
+          required: true
+          description: A chave "role" no body pode ser ignorada, valor padrão "customer".
+          schema:
+            type: object
+            properties:
+              name: 
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+              role:
+                type: string
+      responses:
+        200:
+          description: Retorna uma mensagem de sucesso e o ID do usuário atualizado
+        401:
+          description: Token de autenticação ausente, incorreto ou de um usuário sem nível de acesso apropriado
+        400:
+          description: Dados incorretos (faltando ou erro de formatação)
+        404:
+          description: Usuário com o ID passado não encontrado no banco de dados
+        500:
+          description: Erro interno de servidor
+  /users/{id}/sales:
+    get:
+      security:
+        - consumidorAuth: []
+          vendedorAuth: []
+          adminAuth: []
+      tags:
+        - Users
+      summary: "Retorna um usuário cadastrado a partir do ID com todas as vendas do usuário (auth: consumidor)"
+      description: Verifica se o usuário está autenticado, recebe o ID pelos parâmetros da rota (se for um consumidor verifica se tem o mesmo ID que está buscando), busca no banco o usuário referente a esse ID e retorna as informações deste usuário, junto com todas as suas vendas cadastradas (se for um vendedor as vendas aparecerão na chave "userSales", se for um consumidor as vendas aparecerão na chave "userOrders").
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: Id do usuário
+      responses:
+        200:
+          description: Retorna as informações do usuário a partir do ID, com suas vendas ou compras
+        401:
+          description: Token de autenticação ausente ou incorreto
+        404:
+          description: Usuário com o ID passado não encontrado no banco de dados
+        500:
+          description: Erro interno de servidor
+  /users/sales:
+    get:
+      security:
+        - vendedorAuth: []
+          adminAuth: []
+      tags:
+        - Users
+      summary: "Lista todos os usuários cadastrados com todas as vendas do usuário (auth: vendedor)"
+      description: Verifica se o usuário está autenticado, tem nível de autenticação mínimo de vendedor e lista todos os usuários cadastrados no banco de dados, junto com todas as suas vendas cadastradas (se for um vendedor as vendas apareceram na chave "userSales", se for um consumidor as vendas aparecem na chave "userOrders").
+      responses:
+        200:
+          description: Retorna todos os usuários cadastrados no banco de dados, com suas vendas ou compras
+        401:
+          description: Token de autenticação ausente, incorreto ou de um usuário sem nível de acesso apropriado
+        500:
+          description: Erro interno de servidor
+  /sales:
+    get:
+      security:
+        - consumidorAuth: []
+          vendedorAuth: []
+          adminAuth: []
+      tags:
+        - Sales
+      summary: "Lista todos as vendas cadastrados (auth: consumidor)"
+      description: Verifica se o usuário está autenticado e lista todos as vendas cadastradas no banco de dados
+      responses:
+        200:
+          description: Retorna todos os usuários cadastrados no banco de dados
+        401:
+          description: Token de autenticação ausente, incorreto ou de um usuário sem nível de acesso apropriado
+        500:
+          description: Erro interno de servidor
+    post:
+      security:
+        - consumidorAuth: []
+          vendedorAuth: []
+          adminAuth: []
+      tags:
+        - Sales
+      summary: "Adiciona uma nova venda (auth: consumidor)"
+      description: Verifica se o usuário está autenticado, tem nível de autenticação mínimo de consumidor e, recebendo os dados corretos, adiciona uma nova venda ao banco de dados
+      parameters:
+        - in: body
+          name: body
+          type: object
+          required: true
+          schema:
+            type: object
+            properties:
+              userId: 
+                type: number
+              sellerId:
+                type: number
+              totalPrice:
+                type: number
+              deliveryAddress:
+                type: string
+              deliveryNumber:
+                type: string
+              products:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    quantity:
+                      type: number
+      responses:
+        201:
+          description: Retorna a venda criada
+        400:
+          description: Dados para cadastro incorretos (faltando ou erro de formatação)
+        401:
+          description: Token de autenticação ausente, incorreto ou de um usuário sem nível de acesso apropriado
+        500:
+          description: Erro interno de servidor
+  /sales/{id}:
+    get:
+      security:
+        - vendedorAuth: []
+          adminAuth: []
+      tags:
+        - Sales
+      summary: "Retorna uma venda cadastrada a partir do ID (auth: vendedor)"
+      description: Verifica se o usuário está autenticado, recebe o ID pelos parâmetros da rota, busca no banco a venda referente a esse ID e retorna as informações desta venda.
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: Id da venda
+      responses:
+        200:
+          description: Retorna as informações da venda a partir do ID
+        401:
+          description: Token de autenticação ausente, incorreto ou de um usuário sem nível de acesso apropriado
+        404:
+          description: Venda com o ID passado não encontrada no banco de dados
+        500:
+          description: Erro interno de servidor
+    delete:
+      security:
+        - vendedorAuth: []
+          adminAuth: []
+      tags:
+        - Sales
+      summary: "Deleta uma venda cadastrada a partir do ID (auth: vendedor)"
+      description: Verifica se o usuário está autenticado e tem nível de autenticação mínimo de vendedor, recebe o ID pelos parâmetros da rota, busca no banco a venda referente a esse ID e deleta as informações desta venda.
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: Id da venda
+      responses:
+        200:
+          description: Retorna uma mensagem de sucesso e o ID da venda deletada
+        401:
+          description: Token de autenticação ausente, incorreto ou de um usuário sem nível de acesso apropriado
+        404:
+          description: Venda com o ID passado não encontrada no banco de dados
+        500:
+          description: Erro interno de servidor
+    patch:
+      security:
+        - consumidorAuth: []
+          vendedorAuth: []
+          adminAuth: []
+      tags:
+        - Sales
+      summary: "Atualiza o status de uma venda a partir do ID (auth: consumidor)"
+      description: Verifica se o usuário está autenticado, recebe o ID pelos parâmetros da rota, busca no banco a venda referente a esse ID e, caso receba os dados corretos, atualiza o status desta venda.
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: Id da venda
+        - in: body
+          name: body
+          type: object
+          required: true
+          schema:
+            type: object
+            properties:
+              status: 
+                type: string
+      responses:
+        200:
+          description: Retorna uma mensagem de sucesso e o ID da venda atualizada
+        401:
+          description: Token de autenticação ausente ou incorreto
+        400:
+          description: Dados incorretos (faltando ou erro de formatação)
+        404:
+          description: Venda com o ID passado não encontrada no banco de dados
+        500:
+          description: Erro interno de servidor
+  /sales/user/{userId}:
+    get:
+      security:
+        - consumidorAuth: []
+          vendedorAuth: []
+          adminAuth: []
+      tags:
+        - Sales
+      summary: "Retorna todas as vendas de um consumidor (auth: consumidor)"
+      description: Verifica se o usuário está autenticado, recebe o userID pelos parâmetros da rota, busca no banco o usuário referente a esse userID e retorna toda as vendas deste consumidor.
+      parameters:
+        - in: path
+          name: userId
+          type: integer
+          required: true
+          description: Id do usuário
+      responses:
+        200:
+          description: Retorna as informações das vendas de um consumidor
+        401:
+          description: Token de autenticação ausente, incorreto ou de um usuário sem nível de acesso apropriado
+        404:
+          description: Usuário com userId passado não encontrado ou vendas não encontradas
+        500:
+          description: Erro interno de servidor
+  /sales/seller/{sellerId}:
+    get:
+      security:
+        - vendedorAuth: []
+          adminAuth: []
+      tags:
+        - Sales
+      summary: "Retorna todas as vendas de um vendedor (auth: vendedor)"
+      description: Verifica se o usuário está autenticado, recebe o sellerID pelos parâmetros da rota, busca no banco o usuário referente a esse sellerID e retorna toda as vendas deste vendedor.
+      parameters:
+        - in: path
+          name: sellerId
+          type: integer
+          required: true
+          description: Id do vendedor
+      responses:
+        200:
+          description: Retorna as informações das vendas de um vendedor
+        401:
+          description: Token de autenticação ausente, incorreto ou de um usuário sem nível de acesso apropriado
+        404:
+          description: Usuário com sellerId passado não encontrado ou vendas não encontradas
+        500:
+          description: Erro interno de servidor
