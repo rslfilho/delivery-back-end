@@ -6,7 +6,7 @@ const root = require('../routers/root');
 const { error, swagger } = require('../middlewares');
 
 const corsOptions = {
-  origin: 'https://g3-delivery.vercel.app',
+  origin: 'https://beersdelivery.vercel.app',
   optionsSuccessStatus: 200,
 };
 
