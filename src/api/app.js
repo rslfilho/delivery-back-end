@@ -5,9 +5,14 @@ const express = require('express');
 const root = require('../routers/root');
 const { error, swagger } = require('../middlewares');
 
+const corsOptions = {
+  origin: 'https://g3-delivery.vercel.app',
+  optionsSuccessStatus: 200,
+};
+
 const app = express();
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
