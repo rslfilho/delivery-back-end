@@ -2,7 +2,7 @@
 swagger: '2.0'
 info:
   title: Delivery App API
-  version: 0.0.1
+  version: 0.2.0
   description: |
     Documentação para a aplicação banckend para o projeto Delivery App
 
@@ -21,14 +21,6 @@ info:
     Consumidor:
       - email: zebirita@email.com
       - senha: $#zebirita#$
-
-    Os tokens a seguir estão válidos até o dia 10/02/2022
-
-    Admin: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoxLCJuYW1lIjoiRGVsaXZlcnkgQXBwIEFkbWluIiwiZW1haWwiOiJhZG1AZGVsaXZlcnlhcHAuY29tIiwicm9sZSI6ImFkbWluaXN0cmF0b3IifSwiaWF0IjoxNjQzMzE4NzkxLCJleHAiOjE2NDQ1MjgzOTF9.iqPNPL8-DjNRWigYaq3NC9wgbhxnEIe5rgkE9V-QXjY
-
-    Vendedor: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoyLCJuYW1lIjoiRnVsYW5hIFBlcmVpcmEiLCJlbWFpbCI6ImZ1bGFuYUBkZWxpdmVyeWFwcC5jb20iLCJyb2xlIjoic2VsbGVyIn0sImlhdCI6MTY0MzMxODg2NywiZXhwIjoxNjQ0NTI4NDY3fQ.4tzsIOhAtd_3232rZ7q5J5Yh9Ow3LxOpCy1odD7QVq0
-
-    Consumidor: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjozLCJuYW1lIjoiQ2xpZW50ZSBaw6kgQmlyaXRhIiwiZW1haWwiOiJ6ZWJpcml0YUBlbWFpbC5jb20iLCJyb2xlIjoiY3VzdG9tZXIifSwiaWF0IjoxNjQzMzE4OTA0LCJleHAiOjE2NDQ1Mjg1MDR9.KaTAoFg_SJU6uN4peQomqFr5JqurVpmAqS-aEbP2AjY
 securityDefinitions:
   adminAuth:
     type: apiKey
