@@ -32,9 +32,27 @@ Foi desenvolvida a aplicação back-end para para que fosse possível fazer toda
 - Fluxo do administrador
   - Gerenciar usuários;
 
+Foi desenvolvida uma aplicação front-end que se encontra [nesse repositório](https://github.com/rslfilho/delivery-front-end).
+
 ## Como usar online
 
 Para acessar a página Swagger da aplicação rodando e/ou testar a aplicação, ver detalhadamente os parâmetros esperados, as possíveis respostas e sua formatação, basta clicar [aqui](https://g3-deliveryapp-backend.herokuapp.com/swagger/).
+
+A aplicação front-end online pode ser acessada [aqui](https://beersdelivery.vercel.app/). Para logar, você pode usar os dados abaixo:
+
+```
+Admin:
+- email: adm@deliveryapp.com
+- senha: --adm2@21!!--
+
+Vendedor:
+- email: fulana@deliveryapp.com
+- senha: fulana@123
+
+Consumidor:
+- email: zebirita@email.com
+- senha: $#zebirita#$
+```
 
 ## Como usar no ambiente local
 
