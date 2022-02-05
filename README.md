@@ -187,7 +187,7 @@ Na pasta `/src` temos:
 * `npm run test:coverage` para rodar todos os testes e gerar o relatório de cobertura na tela do terminal;
 * `npm run test:coverage:json` para rodar todos os testes e gerar o relatório de cobertura em json, acessível na pasta `/coverage`;
 * `npm run test:coverage:report` para rodar todos os testes e gerar o relatório de cobertura em html, acessível na pasta `/coverage/lcov-report/`;
-* `yarn lint` ou `npm run lint` para rodar o ESLint;
+* `npm run lint` para rodar o ESLint;
 
 ## Deploy
 
