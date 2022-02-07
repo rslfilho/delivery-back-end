@@ -1,3 +1,4 @@
+require('dotenv').config();
 const cors = require('cors');
 const path = require('path');
 const express = require('express');
@@ -6,7 +7,7 @@ const root = require('../routers/root');
 const { error, swagger } = require('../middlewares');
 
 const corsOptions = {
-  origin: 'https://beersdelivery.vercel.app',
+  origin: process.env.FRONTEND_URL,
   optionsSuccessStatus: 200,
 };
 

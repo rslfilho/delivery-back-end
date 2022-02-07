@@ -1,3 +1,4 @@
+require('dotenv').config();
 const http = require('http');
 const socket = require('socket.io');
 const express = require('./app');
@@ -8,7 +9,7 @@ const io = socket(
   httpServer,
   {
     cors: {
-      origin: 'https://beersdelivery.vercel.app',
+      origin: process.env.FRONTEND_URL,
       methods: ['GET', 'POST'],
     },
   },
