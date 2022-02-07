@@ -80,48 +80,22 @@ MYSQL_USER=<seu_username>
 MYSQL_PASSWORD=<sua_senha>
 MYSQL_DB_NAME=delivery-app
 EVAL_ALWAYS_RESTORE_DEV_DB=true
+FRONTEND_URL=http://localhost:3000
 ```
 
-4 - Mude os endereços liberados nas configurações da API para `localhost`:
-
-`/src/api/app.js`
-```javascript
-(...)
-const corsOptions = {
-  origin: 'http://localhost:3000',
-  optionsSuccessStatus: 200,
-};
-(...)
-```
-
-`/src/api/socket.js`
-```javascript
-(...)
-const io = socket(
-  httpServer,
-  {
-    cors: {
-      origin: 'http://localhost:3000',
-      methods: ['GET', 'POST'],
-    },
-  },
-);
-(...)
-```
-
-5 - Execute o comando para criar e migrar o banco de dados:
+4 - Execute o comando para criar e migrar o banco de dados:
 
 ```bash
 npm run db:reset
 ```
 
-6 - Depois de instaladas as depedências, inicie a aplicação:
+5 - Depois de instaladas as depedências, inicie a aplicação:
 
 ```bash
 npm start
 ```
 
-7 - A aplicação estárá rodando e acessível em `http://localhost:3001/`. A porta pode modificar se tiver uma variável `PORT` no ambiente que estiver executando.
+6 - A aplicação estárá rodando e acessível em `http://localhost:3001/`. A porta pode modificar se tiver uma variável `PORT` no ambiente que estiver executando.
 Para acessar pode utilizar os seguintes dados de login:
 
 ```
@@ -138,7 +112,7 @@ Consumidor:
 - senha: $#zebirita#$
 ```
 
-8 - Para acessar a descrição da API e/ou testar seu funcionamento, ver detalhadamente os parâmetros esperados, as possíveis respostas e sua formatação, basta acessar `http://localhost:3001/swagger/`.
+7 - Para acessar a descrição da API e/ou testar seu funcionamento, ver detalhadamente os parâmetros esperados, as possíveis respostas e sua formatação, basta acessar `http://localhost:3001/swagger/`.
 
 ## Desenvolvimento
 
